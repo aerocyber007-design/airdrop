@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "/api/config",
+      "dest": "/api/config.js"
+    },
+    {
+      "src": "/api/event",
+      "dest": "/api/event.js"
+    },
+    {
+      "src": "/send",
+      "dest": "/send.html"
+    },
+    {
+      "src": "/connect",
+      "dest": "/connect.html"
+    },
+    {
+      "src": "/docs",
+      "dest": "/decoy.html"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
